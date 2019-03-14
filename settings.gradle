@@ -1,1 +1,1 @@
-include ':app', ':kismet'
+include ':app', ':kismet', ':kaleidoscope'
