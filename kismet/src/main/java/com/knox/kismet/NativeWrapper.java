@@ -9,7 +9,7 @@ package com.knox.kismet;
 public class NativeWrapper {
     // Used to load the 'native-lib' library on application startup.
     static {
-        System.loadLibrary("native-lib-kismet");
+        System.loadLibrary("kismet");
     }
 
     /**
