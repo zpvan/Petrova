@@ -8,3 +8,4 @@ Java_com_knox_kismet_NativeWrapper_stringFromJNI(
     std::string hello = "Hello from C++ Kismet";
     return env->NewStringUTF(hello.c_str());
 }
+
