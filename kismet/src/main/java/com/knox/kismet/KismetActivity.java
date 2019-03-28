@@ -29,43 +29,48 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
 
     @Override
     protected void onStart() {
-        Log.e(TAG, "onStart: ");
         super.onStart();
-
     }
 
     @Override
     protected void onResume() {
-        Log.e(TAG, "onResume: ");
         super.onResume();
-        mPlayer.start();
+        if (null != mPlayer) {
+            mPlayer.start();
+        }
     }
 
     @Override
     protected void onPause() {
-        Log.e(TAG, "onPause: ");
         super.onPause();
-        mPlayer.pause();
+        if (null != mPlayer) {
+            mPlayer.pause();
+        }
     }
 
     @Override
     protected void onStop() {
-        Log.e(TAG, "onStop: ");
         super.onStop();
-        mPlayer.stop();
+        if (null != mPlayer) {
+            mPlayer.stop();
+        }
     }
 
     @Override
     protected void onDestroy() {
-        Log.e(TAG, "onDestroy: ");
         super.onDestroy();
-        mPlayer.release();
+        if (null != mPlayer) {
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.e(TAG, "surfaceCreated: HolderCallback");
-        mPlayer = new PlayerProxy();
+        if (null == mPlayer) {
+            mPlayer = new PlayerProxy();
+        }
         mPlayer.setDataSource(Environment.getExternalStorageDirectory().getPath() + "/Download/valor-01-01.mp4");
         mPlayer.setDisplay(holder);
         mPlayer.prepare();
@@ -75,13 +80,18 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.e(TAG, "surfaceChanged: HolderCallback");
-        mPlayer.setDisplay(holder);
+        if (null != mPlayer) {
+            mPlayer.setDisplay(holder);
+        }
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.e(TAG, "surfaceDestroyed: HolderCallback");
-        mPlayer.release();
+        if (null != mPlayer) {
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     private void setUpView() {

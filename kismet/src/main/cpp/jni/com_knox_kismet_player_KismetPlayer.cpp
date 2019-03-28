@@ -2,8 +2,8 @@
 #include <jni.h>
 /* Header for class com_knox_kismet_player_KismetPlayer */
 
-#include "kislog.h"
-#include "player/kismetplayer.h"
+#include "util/KisLog.h"
+#include "player/KismetPlayer.h"
 #include "android/native_window_jni.h"
 
 #ifndef _Included_com_knox_kismet_player_KismetPlayer
@@ -23,17 +23,18 @@ struct fields_t {
 static fields_t gFields;
 //------static method-------------------------------------------------------------------------------
 
-static kismetplayer *getKismetPlayer(JNIEnv *env, jobject thiz) {
-    kismetplayer *player = (kismetplayer *) env->GetLongField(thiz, gFields.context);
+static KismetPlayer *getKismetPlayer(JNIEnv *env, jobject thiz) {
+    KismetPlayer *player = (KismetPlayer *) env->GetLongField(thiz, gFields.context);
 //    KLOGE(LOG_TAG, "get-player [%p]", player);
     return player;
 }
 
-static void setKismetPlayer(JNIEnv *env, jobject thiz, const kismetplayer *player) {
+static void setKismetPlayer(JNIEnv *env, jobject thiz, const KismetPlayer *player) {
 //    KLOGE(LOG_TAG, "set-player [%p]", player);
-    kismetplayer *old = getKismetPlayer(env, thiz);
+    KismetPlayer *old = getKismetPlayer(env, thiz);
     if (nullptr != old) {
-        old->release();        old = nullptr;
+        old->release();
+        old = nullptr;
     }
     env->SetLongField(thiz, gFields.context, (jlong) player);
 }
@@ -62,8 +63,8 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1init
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1setup
         (JNIEnv *env, jobject thiz) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1setup");
-    kismetplayer *player = new kismetplayer();
+    KismetPlayer *player = new KismetPlayer();
+    player->init();
     setKismetPlayer(env, thiz, player);
 }
 
@@ -74,8 +75,7 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1setup
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1setDataSource
         (JNIEnv *env, jobject thiz, jstring jpath) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1setDataSource");
-    kismetplayer *player = getKismetPlayer(env, thiz);
+    KismetPlayer *player = getKismetPlayer(env, thiz);
     if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in setDataSource");
         return;
@@ -91,13 +91,12 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1setDataS
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1setDisplay
         (JNIEnv *env, jobject thiz, jobject surface) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1setDisplay");
-    kismetplayer *kismetplayer = getKismetPlayer(env, thiz);
-    if (nullptr == kismetplayer) {
+    KismetPlayer *player = getKismetPlayer(env, thiz);
+    if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in setDisplay");
         return;
     }
-    kismetplayer->setDisplay(ANativeWindow_fromSurface(env, surface));
+    player->setDisplay(ANativeWindow_fromSurface(env, surface));
 }
 
 /*
@@ -107,13 +106,12 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1setDispl
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1prepare
         (JNIEnv *env, jobject thiz) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1prepare");
-    kismetplayer *kismetplayer = getKismetPlayer(env, thiz);
-    if (nullptr == kismetplayer) {
+    KismetPlayer *player = getKismetPlayer(env, thiz);
+    if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in prepare");
         return;
     }
-    kismetplayer->prepare();
+    player->prepare();
 }
 
 /*
@@ -123,13 +121,12 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1prepare
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1prepareAsync
         (JNIEnv *env, jobject thiz) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1prepareAsync");
-    kismetplayer *kismetplayer = getKismetPlayer(env, thiz);
-    if (nullptr == kismetplayer) {
+    KismetPlayer *player = getKismetPlayer(env, thiz);
+    if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in prepareAsync");
         return;
     }
-    kismetplayer->prepareAsync();
+    player->prepareAsync();
 }
 
 /*
@@ -139,13 +136,12 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1prepareA
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1start
         (JNIEnv *env, jobject thiz) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1start");
-    kismetplayer *kismetplayer = getKismetPlayer(env, thiz);
-    if (nullptr == kismetplayer) {
+    KismetPlayer *player = getKismetPlayer(env, thiz);
+    if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in start");
         return;
     }
-    kismetplayer->start();
+    player->start();
 }
 
 /*
@@ -155,13 +151,12 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1start
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1stop
         (JNIEnv *env, jobject thiz) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1stop");
-    kismetplayer *kismetplayer = getKismetPlayer(env, thiz);
-    if (nullptr == kismetplayer) {
+    KismetPlayer *player = getKismetPlayer(env, thiz);
+    if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in stop");
         return;
     }
-    kismetplayer->stop();
+    player->stop();
 }
 
 /*
@@ -171,13 +166,12 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1stop
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1pause
         (JNIEnv *env, jobject thiz) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1pause");
-    kismetplayer *kismetplayer = getKismetPlayer(env, thiz);
-    if (nullptr == kismetplayer) {
+    KismetPlayer *player = getKismetPlayer(env, thiz);
+    if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in pause");
         return;
     }
-    kismetplayer->pause();
+    player->pause();
 }
 
 /*
@@ -187,13 +181,12 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1pause
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1reset
         (JNIEnv *env, jobject thiz) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1reset");
-    kismetplayer *kismetplayer = getKismetPlayer(env, thiz);
-    if (nullptr == kismetplayer) {
+    KismetPlayer *player = getKismetPlayer(env, thiz);
+    if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in reset");
         return;
     }
-    kismetplayer->reset();
+    player->reset();
 }
 
 /*
@@ -203,13 +196,12 @@ JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1reset
  */
 JNIEXPORT void JNICALL Java_com_knox_kismet_player_KismetPlayer_native_1release
         (JNIEnv *env, jobject thiz) {
-    KLOGE(LOG_TAG, "Java_com_knox_kismet_player_KismetPlayer_native_1release");
-    kismetplayer *kismetplayer = getKismetPlayer(env, thiz);
-    if (nullptr == kismetplayer) {
+    KismetPlayer *player = getKismetPlayer(env, thiz);
+    if (nullptr == player) {
         KLOGE(LOG_TAG, "can't get player in release");
         return;
     }
-    kismetplayer->release();
+    player->release();
 }
 
 //------dynamic register----------------------------------------------------------------------------
