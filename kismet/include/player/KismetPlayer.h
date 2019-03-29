@@ -28,15 +28,24 @@ public:
     void threadRun();
 
 private:
-    void innerSetDataSource(const char *path);
+    void innerSetDataSource(const char *url);
     void innerSetDisplay(void *surface);
     void innerPrepare();
-    void innerPrepareAsync();
     void innerStart();
     void innerStop();
+    void innerPause();
+    void innerReset();
+    void innerRelease();
+
+    void saveIt();
+
+    void pushMsg2List(player_cmd_t cmd, void *data);
+    void wait4PrepareDone();
 
     pthread_t inner_thread;
+    pthread_mutex_t msg_list_mutex;
     std::list<player_msg_t> msg_list;
+
 };
 
 

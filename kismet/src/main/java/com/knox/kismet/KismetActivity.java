@@ -11,12 +11,16 @@ import android.view.SurfaceHolder;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import java.io.File;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class KismetActivity extends AppCompatActivity implements SurfaceHolder.Callback{
 
     private static final String TAG = "KismetActivity";
+
+    private static final String MEDIA_FILE = "/mnt/sdcard/Download/valor-01-01.mp4";
     private PlayerProxy mPlayer;
 
     @Override
@@ -71,7 +75,14 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
         if (null == mPlayer) {
             mPlayer = new PlayerProxy();
         }
-        mPlayer.setDataSource(Environment.getExternalStorageDirectory().getPath() + "/Download/valor-01-01.mp4");
+//        File mediaFile = new File(MEDIA_FILE);
+        File mediaFile = new File("/mnt/sdcard/DCIM/Camera/1548569015270.jpg");
+        if (mediaFile.exists()) {
+            Log.e(TAG, "surfaceCreated: mediaFile(exists=" + mediaFile.exists() + " read=" +
+                    mediaFile.canRead() + " write=" + mediaFile.canWrite() + " execute=" + mediaFile.canExecute() + ")");
+        }
+        mPlayer.setDataSource(MEDIA_FILE);
+//        mPlayer.setDataSource(Environment.getExternalStorageDirectory().getPath() + "/Download/valor-01-01.mp4");
         mPlayer.setDisplay(holder);
         mPlayer.prepare();
         mPlayer.start();

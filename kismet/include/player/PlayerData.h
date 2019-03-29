@@ -6,13 +6,19 @@
 #define PETROVA_PLAYER_DATA_H
 
 typedef enum {
-    SETDATASOURCE,
-    RELEASE,
+    PLAYER_CMD_SET_DATA_SOURCE,
+    PLAYER_CMD_SET_DISPLAY,
+    PLAYER_CMD_PREPARE,
+    PLAYER_CMD_START,
+    PLAYER_CMD_STOP,
+    PLAYER_CMD_RESET,
+    PLAYER_CMD_PAUSE,
+    PLAYER_CMD_RELEASE,
 } player_cmd_t;
 
 typedef struct {
-    void *data;
     player_cmd_t cmd;
+    void *data;
 } player_msg_t;
 
 #endif //PETROVA_PLAYER_DATA_H

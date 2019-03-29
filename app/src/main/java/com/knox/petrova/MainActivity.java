@@ -1,11 +1,14 @@
 package com.knox.petrova;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.knox.kismet.NativeWrapper;
 
@@ -22,7 +25,18 @@ public class MainActivity extends AppCompatActivity {
         tvText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startAarActivity("com.knox.petrova", "com.knox.kismet.KismetActivity");
+                PermissionHelper.runOnPermissionGranted(MainActivity.this, new Runnable() {
+                    @Override
+                    public void run() {
+                        startAarActivity("com.knox.petrova", "com.knox.kismet.KismetActivity");
+                    }
+                }, new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "can't have permision", Toast.LENGTH_LONG).show();
+                    }
+                }, Manifest.permission.READ_EXTERNAL_STORAGE);
+
             }
         });
     }
@@ -35,5 +49,10 @@ public class MainActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setComponent(new ComponentName(myPackageName, targetActivityName));
         getApplicationContext().startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        PermissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
