@@ -11,6 +11,7 @@
 #include "player/PlayerData.h"
 #include "player/FFDemuxer.h"
 #include "player/FFDecoder.h"
+#include "player/GLWindow.h"
 
 class KismetPlayer {
 
@@ -48,8 +49,9 @@ private:
     pthread_mutex_t msg_list_mutex;
     std::list<player_msg_t> msg_list;
 
-    FFDemuxer *ffDemuxer;
-    FFDecoder *ffDecoder;
+    FFDemuxer *ffDemuxer = nullptr;
+    FFDecoder *ffDecoder = nullptr;
+    GLWindow *glWindow = nullptr;
 };
 
 

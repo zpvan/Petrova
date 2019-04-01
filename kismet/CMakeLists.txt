@@ -40,7 +40,7 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         src/main/cpp/jni/native-lib.cpp
         src/main/cpp/jni/com_knox_kismet_player_KismetPlayer.cpp
-        src/main/cpp/player/kismetplayer.cpp
+        src/main/cpp/player/KismetPlayer.cpp
         src/main/cpp/player/FFDemuxer.cpp
         src/main/cpp/player/FFDecoder.cpp
         src/main/cpp/player/GLWindow.cpp)

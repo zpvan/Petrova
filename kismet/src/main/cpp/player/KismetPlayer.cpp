@@ -198,7 +198,7 @@ void KismetPlayer::innerSetDataSource(const char *url) {
 }
 
 void KismetPlayer::innerSetDisplay(void *surface) {
-
+    glWindow = GLWindow::create(surface);
 }
 
 void KismetPlayer::innerPrepare() {
