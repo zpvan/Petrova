@@ -10,11 +10,11 @@
 #include "util/KisLog.h"
 #include "util/KisThd.h"
 
-#define TAG_LOG "kismetplayer"
+#define TAG_LOG "KismetPlayerCpp"
 
 static const char *THREAD_NAME = "PLY";
 
-#define TEST_FLOW 1
+#define TEST_FLOW 0
 
 #if TEST_FLOW
 extern "C" {
@@ -193,6 +193,8 @@ void KismetPlayer::innerSetDataSource(const char *url) {
     // 打开多媒体文件
     avformat_open_input(&pFormatCtx, url, NULL, NULL);
 #endif
+
+    ffDemuxer = FFDemuxer::open(url);
 }
 
 void KismetPlayer::innerSetDisplay(void *surface) {
@@ -238,6 +240,11 @@ void KismetPlayer::innerPrepare() {
     // 分配视频帧内存空间
     pFrame = av_frame_alloc();
 #endif
+
+    ffDemuxer->parse();
+    int bvi = ffDemuxer->getBestVideoIndex();
+    KLOGE(TAG_LOG, "best video %d", bvi);
+    ffDecoder = FFDecoder::openVideoDecoder(ffDemuxer);
 }
 
 void KismetPlayer::innerStart() {
@@ -275,6 +282,23 @@ void KismetPlayer::innerStart() {
         av_packet_free(&pkt);
     } while (res >= 0);
 #endif
+
+    int count = 0;
+    // TODO thread
+    while (1) {
+        AVPacket *pkt = ffDemuxer->read();
+        if (nullptr == pkt) {
+            break;
+        }
+        ffDecoder->push(pkt);
+        AVFrame *frame = nullptr;
+        do {
+            ffDecoder->free(frame);
+            frame = ffDecoder->get();
+            KLOGE(TAG_LOG, "get frame count=%d", ++count);
+        } while (nullptr != frame);
+        ffDemuxer->free(pkt);
+    }
     KLOGE(TAG_LOG, "innerStart Out");
 }
 

@@ -9,6 +9,8 @@
 #include <list>
 
 #include "player/PlayerData.h"
+#include "player/FFDemuxer.h"
+#include "player/FFDecoder.h"
 
 class KismetPlayer {
 
@@ -46,6 +48,8 @@ private:
     pthread_mutex_t msg_list_mutex;
     std::list<player_msg_t> msg_list;
 
+    FFDemuxer *ffDemuxer;
+    FFDecoder *ffDecoder;
 };
 
 
