@@ -53,7 +53,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/player/GLShader.cpp
 
         # Data
-        src/main/cpp/player/VoData.cpp)
+        src/main/cpp/data/VoData.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

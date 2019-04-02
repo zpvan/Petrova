@@ -2,7 +2,7 @@
 // Created by michelle on 2019/4/2.
 //
 
-#include "player/VoData.h"
+#include "data/VoData.h"
 
 #include "util/KisLog.h"
 

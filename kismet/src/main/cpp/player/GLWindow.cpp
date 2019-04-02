@@ -3,6 +3,7 @@
 //
 
 #include "player/GLWindow.h"
+
 #include "util/KisLog.h"
 
 #include <android/native_window.h>

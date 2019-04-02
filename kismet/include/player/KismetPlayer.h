@@ -5,13 +5,13 @@
 #ifndef PETROVA_KISMETPLAYER_H
 #define PETROVA_KISMETPLAYER_H
 
-#include <pthread.h>
-#include <list>
-
-#include "player/PlayerData.h"
 #include "player/FFDemuxer.h"
 #include "player/FFDecoder.h"
 #include "player/GLWindow.h"
+#include "data/PlayerData.h"
+
+#include <pthread.h>
+#include <list>
 
 class KismetPlayer {
 

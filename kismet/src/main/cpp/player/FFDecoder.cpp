@@ -3,6 +3,7 @@
 //
 
 #include "player/FFDecoder.h"
+
 #include "util/KisLog.h"
 
 #define TAG_LOG "FFDecoder"

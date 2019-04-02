@@ -7,7 +7,7 @@
 
 #ifdef ANDROID
 
-#include "android/log.h"
+#include <android/log.h>
 
 #define KLOGD(TAG, ...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 #define KLOGE(TAG, ...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)

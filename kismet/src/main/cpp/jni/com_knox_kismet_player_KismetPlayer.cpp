@@ -2,9 +2,10 @@
 #include <jni.h>
 /* Header for class com_knox_kismet_player_KismetPlayer */
 
-#include "util/KisLog.h"
 #include "player/KismetPlayer.h"
-#include "android/native_window_jni.h"
+#include "util/KisLog.h"
+
+#include <android/native_window_jni.h>
 
 #ifndef _Included_com_knox_kismet_player_KismetPlayer
 #define _Included_com_knox_kismet_player_KismetPlayer

@@ -4,9 +4,9 @@
 
 #include "player/GLShader.h"
 
-#include "GLES2/gl2.h"
-
 #include "util/KisLog.h"
+
+#include <GLES2/gl2.h>
 
 #define TAG_LOG "GLShader"
 
@@ -130,8 +130,8 @@ static GLuint initShader(const char *code, GLenum type) {
     return sh;
 }
 
-FRAGMENT_SHADER_TYPE GLShader::pixelFmt2ShaderType(AVPixelFormat pixelFormat) {
-    FRAGMENT_SHADER_TYPE type = FS_TYPE_UNKNOWN;
+fragment_shader_t GLShader::pixelFmt2ShaderType(AVPixelFormat pixelFormat) {
+    fragment_shader_t type = FS_TYPE_UNKNOWN;
     switch (pixelFormat) {
         case AV_PIX_FMT_YUV420P:
             type = FS_TYPE_YUV420P;
@@ -152,7 +152,7 @@ FRAGMENT_SHADER_TYPE GLShader::pixelFmt2ShaderType(AVPixelFormat pixelFormat) {
     return type;
 }
 
-bool GLShader::init(FRAGMENT_SHADER_TYPE type) {
+bool GLShader::init(fragment_shader_t type) {
     //顶点和片元着色器初始化
     vsh = initShader(vertexShader, GL_VERTEX_SHADER); //顶点shader初始化
     if (vsh == 0) {
@@ -295,6 +295,6 @@ void GLShader::draw() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-FRAGMENT_SHADER_TYPE GLShader::getFragmentShaderType() {
+fragment_shader_t GLShader::getFragmentShaderType() {
     return ftype;
 }

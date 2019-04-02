@@ -4,12 +4,12 @@
 
 #include "player/KismetPlayer.h"
 
-#include <unistd.h>
-
-#include "player/PlayerData.h"
-#include "player/VoData.h"
+#include "data/PlayerData.h"
+#include "data/VoData.h"
 #include "util/KisLog.h"
 #include "util/KisThd.h"
+
+#include <unistd.h>
 
 #define TAG_LOG "KismetPlayerCpp"
 

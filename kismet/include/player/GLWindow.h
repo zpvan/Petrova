@@ -5,10 +5,10 @@
 #ifndef PETROVA_GLWINDOW_H
 #define PETROVA_GLWINDOW_H
 
-#include "EGL/egl.h"
-
-#include "player/VoData.h"
 #include "player/GLTexture.h"
+#include "data/VoData.h"
+
+#include <EGL/egl.h>
 
 class GLWindow {
 public:
