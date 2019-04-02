@@ -5,8 +5,9 @@
 #include "player/KismetPlayer.h"
 
 #include <unistd.h>
-#include <player/PlayerData.h>
 
+#include "player/PlayerData.h"
+#include "player/VoData.h"
 #include "util/KisLog.h"
 #include "util/KisThd.h"
 
@@ -294,8 +295,18 @@ void KismetPlayer::innerStart() {
         AVFrame *frame = nullptr;
         do {
             ffDecoder->free(frame);
+            frame = nullptr;
             frame = ffDecoder->get();
-            KLOGE(TAG_LOG, "get frame count=%d", ++count);
+//            KLOGE(TAG_LOG, "get frame count=%d", ++count);
+            // Video case
+            if (nullptr != frame) {
+//                VoData *voData = VoData::create(frame);
+                VoData voData;
+                voData.init(frame);
+                glWindow->render(&voData);
+//                voData->free();
+                voData.free();
+            }
         } while (nullptr != frame);
         ffDemuxer->free(pkt);
     }

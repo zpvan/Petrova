@@ -1,20 +1,15 @@
 package com.knox.kismet;
 
 import android.graphics.Color;
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.io.File;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 public class KismetActivity extends AppCompatActivity implements SurfaceHolder.Callback{
 
@@ -91,9 +86,9 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.e(TAG, "surfaceChanged: HolderCallback");
-        if (null != mPlayer) {
-            mPlayer.setDisplay(holder);
-        }
+        // if (null != mPlayer) {
+        //     mPlayer.setDisplay(holder);
+        // }
     }
 
     @Override
@@ -107,24 +102,24 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
 
     private void setUpView() {
         FrameLayout frameLayout = new FrameLayout(this);
-        GLSurfaceView glSurfaceView = new GLSurfaceView(this);
+        SurfaceView glSurfaceView = new SurfaceView(this);
         glSurfaceView.getHolder().addCallback(this);
-        glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
-            @Override
-            public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-                Log.e(TAG, "onSurfaceCreated: GLSurfaceView.Renderer");
-            }
-
-            @Override
-            public void onSurfaceChanged(GL10 gl, int width, int height) {
-                Log.e(TAG, "onSurfaceChanged: GLSurfaceView.Renderer");
-            }
-
-            @Override
-            public void onDrawFrame(GL10 gl) {
-                GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            }
-        });
+        // glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
+        //     @Override
+        //     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        //         Log.e(TAG, "onSurfaceCreated: GLSurfaceView.Renderer");
+        //     }
+        //
+        //     @Override
+        //     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        //         Log.e(TAG, "onSurfaceChanged: GLSurfaceView.Renderer");
+        //     }
+        //
+        //     @Override
+        //     public void onDrawFrame(GL10 gl) {
+        //         // GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        //     }
+        // });
         TextView textView = new TextView(this);
         textView.setText(TAG);
         textView.setTextColor(Color.RED);

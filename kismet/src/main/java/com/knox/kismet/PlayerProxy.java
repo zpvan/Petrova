@@ -26,7 +26,7 @@ public class PlayerProxy implements BasePlayer {
 
     @Override
     public void setDisplay(SurfaceHolder sh) {
-
+        mInnerPlayer.setDisplay(sh);
     }
 
     @Override

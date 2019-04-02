@@ -38,12 +38,22 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
+        # JNI
         src/main/cpp/jni/native-lib.cpp
         src/main/cpp/jni/com_knox_kismet_player_KismetPlayer.cpp
+
+        # Player Component
         src/main/cpp/player/KismetPlayer.cpp
         src/main/cpp/player/FFDemuxer.cpp
         src/main/cpp/player/FFDecoder.cpp
-        src/main/cpp/player/GLWindow.cpp)
+
+        # OpenGL
+        src/main/cpp/player/GLWindow.cpp
+        src/main/cpp/player/GLTexture.cpp
+        src/main/cpp/player/GLShader.cpp
+
+        # Data
+        src/main/cpp/player/VoData.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

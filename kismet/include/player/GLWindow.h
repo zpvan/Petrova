@@ -7,16 +7,25 @@
 
 #include "EGL/egl.h"
 
+#include "player/VoData.h"
+#include "player/GLTexture.h"
+
 class GLWindow {
 public:
     static GLWindow *create(void *win);
+    void render(VoData *voData);
 
 private:
     GLWindow() {};
+    bool init(void *win);
+    void flip();
 
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface surface = EGL_NO_SURFACE;
     EGLContext context = EGL_NO_CONTEXT;
+
+    GLTexture *glTexture = nullptr;
+    void *win = nullptr;
 };
 
 
