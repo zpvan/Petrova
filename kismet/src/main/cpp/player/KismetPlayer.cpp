@@ -8,8 +8,10 @@
 #include "data/VoData.h"
 #include "util/KisLog.h"
 #include "util/KisThd.h"
+#include "util/BlockingQueueSTL.h"
 
 #include <unistd.h>
+#include <assert.h>
 
 #define TAG_LOG "KismetPlayerCpp"
 
@@ -39,7 +41,7 @@ static int count = 0;
 static unsigned sws_flags = SWS_BICUBIC;
 #endif
 
-void *static_run(void *data) {
+static void *static_run(void *data) {
     // 设置线程名称
     setCurrentThreadname(THREAD_NAME);
     KismetPlayer *player = (KismetPlayer *)data;
@@ -242,10 +244,30 @@ void KismetPlayer::innerPrepare() {
     pFrame = av_frame_alloc();
 #endif
 
-    ffDemuxer->parse();
-    int bvi = ffDemuxer->getBestVideoIndex();
-    KLOGE(TAG_LOG, "best video %d", bvi);
-    ffDecoder = FFDecoder::openVideoDecoder(ffDemuxer);
+    bool res = ffDemuxer->parse();
+    if (!res) {
+        return;
+    }
+    if (ffDemuxer->getBestVideoIndex() >= 0) {
+        KLOGE(TAG_LOG, "best video %d", ffDemuxer->getBestVideoIndex());
+        ffDecoder = FFDecoder::openVideoDecoder(ffDemuxer);
+
+        dmx_v_list = new BlockingQueueSTL<DmxData>(30);
+        ffDemuxer->attachVideoQueue(dmx_v_list);
+        ffDecoder->attachInputQueue(dmx_v_list);
+
+        vo_list = new BlockingQueueSTL<VoData>(3);
+        ffDecoder->attachOutputQueue(vo_list);
+        glWindow->attachInputQueue(vo_list);
+    }
+//    if (ffDemuxer->getBestAudioIndex() >= 0) {
+//        KLOGE(TAG_LOG, "best audio %d", ffDemuxer->getBestAudioIndex());
+//        dmx_a_list = new BlockingQueueSTL(50);
+//        ffDemuxer->attachAudioQueue(dmx_a_list);
+//        ffDecoder = FFDecoder::openAudioDecoder(ffDemuxer);
+//        ffDecoder->attachInputQueue(dmx_a_list);
+//    }
+
 }
 
 void KismetPlayer::innerStart() {
@@ -283,33 +305,35 @@ void KismetPlayer::innerStart() {
         av_packet_free(&pkt);
     } while (res >= 0);
 #endif
-
-    int count = 0;
     // TODO thread
-    while (1) {
-        AVPacket *pkt = ffDemuxer->read();
-        if (nullptr == pkt) {
-            break;
-        }
-        ffDecoder->push(pkt);
-        AVFrame *frame = nullptr;
-        do {
-            ffDecoder->free(frame);
-            frame = nullptr;
-            frame = ffDecoder->get();
-//            KLOGE(TAG_LOG, "get frame count=%d", ++count);
-            // Video case
-            if (nullptr != frame) {
-//                VoData *voData = VoData::create(frame);
-                VoData voData;
-                voData.init(frame);
-                glWindow->render(&voData);
-//                voData->free();
-                voData.free();
-            }
-        } while (nullptr != frame);
-        ffDemuxer->free(pkt);
-    }
+//    while (1) {
+//        DmxData dmxData = ffDemuxer->read();
+//        if (DMX_PACKET_ERROR == dmxData.getDmxPktType()) {
+//            break;
+//        }
+//        ffDecoder->push(dmxData);
+//        AVFrame *frame = nullptr;
+//        do {
+//            ffDecoder->free(frame);
+//            frame = nullptr;
+//            frame = ffDecoder->get();
+//            // Video case
+//            if (nullptr != frame) {
+//                VoData voData;
+//                voData.init(frame);
+//                glWindow->render(&voData);
+//                voData.free();
+//            }
+//        } while (nullptr != frame);
+//        ffDemuxer->free(dmxData);
+//    }
+
+    assert(nullptr != ffDemuxer);
+    ffDemuxer->start();
+    assert(nullptr != ffDecoder);
+    ffDecoder->start();
+    assert(nullptr != glWindow);
+    glWindow->start();
     KLOGE(TAG_LOG, "innerStart Out");
 }
 
@@ -321,6 +345,10 @@ void KismetPlayer::innerStop() {
         av_frame_free(&frame);
     }
 #endif
+
+    glWindow->stop();
+    ffDecoder->stop();
+    ffDemuxer->stop();
 }
 
 void KismetPlayer::innerPause() {

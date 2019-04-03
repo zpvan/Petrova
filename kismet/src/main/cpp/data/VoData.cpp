@@ -12,8 +12,17 @@ VoData *VoData::create(AVFrame *frame) {
     return (new VoData())->init(frame);
 }
 
+void VoData::alloc() {
+    if (nullptr == frame) {
+        frame = av_frame_alloc();
+    }
+}
+
 void VoData::free() {
-    // delete datas;
+    if (nullptr != frame) {
+        av_free(frame);
+        frame = nullptr;
+    }
 }
 
 VoData *VoData::init(AVFrame *frame) {
@@ -24,7 +33,7 @@ VoData *VoData::init(AVFrame *frame) {
     height = frame->height;
 
     format = frame->format;
-    KLOGE(TAG_LOG, "data format is %d, size=%d", frame->format, sizeof(datas));
+    KLOGE(TAG_LOG, "data format is %d, size=%d, w=%d, h=%d", frame->format, sizeof(datas), width, height);
     memcpy(datas, frame->data, sizeof(datas));
     return this;
 }
@@ -43,4 +52,8 @@ int VoData::getWidth() {
 
 int VoData::getHeight() {
     return height;
+}
+
+AVFrame *VoData::getFrame() {
+    return frame;
 }

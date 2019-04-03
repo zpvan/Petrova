@@ -7,22 +7,39 @@
 
 #include "player/FFDemuxer.h"
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-};
+#include "data/VoData.h"
+
+volatile typedef enum {
+    DEC_STATUS_IDLE,
+    DEC_STATUS_RUNNING,
+    DEC_STATUS_STOP,
+} dec_status_t;
 
 class FFDecoder {
 public:
     static FFDecoder *openVideoDecoder(FFDemuxer *demuxer);
-    void push(AVPacket *pkt);
-    AVFrame *get();
+    static FFDecoder *openAudioDecoder(FFDemuxer *demuxer);
+    void push(DmxData dmxData);
+    VoData &get();
     void free(AVFrame *frame);
+    void attachInputQueue(BlockingQueueSTL<DmxData> *input_queue);
+    void attachOutputQueue(BlockingQueueSTL<VoData> *output_queue);
+    void start();
+    void threadRun();
+    void stop();
 
 private:
     FFDecoder() {};
 
     AVCodecContext *avCodecCtx = NULL;
-    int streamIndex = -1;
+    int video_stream_index = -1;
+    int audio_stream_index = -1;
+    BlockingQueueSTL<DmxData> *input_queue;
+    BlockingQueueSTL<VoData> *output_queue;
+
+    pthread_t inner_thread;
+
+    volatile dec_status_t status = DEC_STATUS_IDLE;
 };
 
 

@@ -1,11 +1,14 @@
 package com.knox.kismet;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -22,8 +25,11 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Fullscreen & Landscape
+        setFullscreenAndLandscape();
+
+        // SurfaceView
         setUpView();
-        // setContentView(R.layout.activity_kismet);
     }
 
     @Override
@@ -126,5 +132,12 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
         frameLayout.addView(glSurfaceView);
         frameLayout.addView(textView);
         setContentView(frameLayout);
+    }
+
+    private void setFullscreenAndLandscape() {
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 }

@@ -48,12 +48,13 @@ add_library( # Sets the name of the library.
         src/main/cpp/player/FFDecoder.cpp
 
         # OpenGL
-        src/main/cpp/player/GLWindow.cpp
-        src/main/cpp/player/GLTexture.cpp
-        src/main/cpp/player/GLShader.cpp
+        src/main/cpp/gl/GLWindow.cpp
+        src/main/cpp/gl/GLTexture.cpp
+        src/main/cpp/gl/GLShader.cpp
 
         # Data
-        src/main/cpp/data/VoData.cpp)
+        src/main/cpp/data/VoData.cpp
+        src/main/cpp/data/DmxData.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

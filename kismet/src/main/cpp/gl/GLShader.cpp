@@ -2,11 +2,11 @@
 // Created by michelle on 2019/4/2.
 //
 
-#include "player/GLShader.h"
+#include "gl/GLShader.h"
 
 #include "util/KisLog.h"
 
-#include <GLES2/gl2.h>
+#include "GLES2/gl2.h"
 
 #define TAG_LOG "GLShader"
 
@@ -156,10 +156,10 @@ bool GLShader::init(fragment_shader_t type) {
     //顶点和片元着色器初始化
     vsh = initShader(vertexShader, GL_VERTEX_SHADER); //顶点shader初始化
     if (vsh == 0) {
-        KLOGE(TAG_LOG, "InitShader GL_VERTEX_SHADER failed");
+        KLOGE(TAG_LOG, "initShader GL_VERTEX_SHADER failed");
         return false;
     }
-    KLOGE(TAG_LOG, "InitShader GL_VERTEX_SHADER success");
+    KLOGE(TAG_LOG, "initShader GL_VERTEX_SHADER success");
 
     switch (type) {
         case FS_TYPE_YUV420P:

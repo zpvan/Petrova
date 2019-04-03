@@ -2,26 +2,60 @@
 // Created by michelle on 2019/4/1.
 //
 
-#include "player/GLWindow.h"
+#include "gl/GLWindow.h"
 
 #include "util/KisLog.h"
+#include "util/KisThd.h"
 
 #include <android/native_window.h>
+#include <unistd.h>
 
 #define TAG_LOG "GLWindow"
+
+#define THREAD_NAME "VO"
+
+static void *static_run(void *data) {
+    // 设置线程名称
+    setCurrentThreadname(THREAD_NAME);
+    GLWindow *renderer = (GLWindow *)data;
+    if (nullptr != renderer) {
+        renderer->threadRun();
+    }
+    // 不要漏了返回值, 会发生crash
+    KLOGE(TAG_LOG, "static_run Out %s", getCurrentThreadname());
+    return nullptr;
+}
+
+static void hexdump(const unsigned char *buf, const int num)
+{
+    int i;
+    printf(TAG_LOG);
+    for(i = 0; i < num; i++)
+    {
+        printf("%02X ", buf[i]);
+        if ((i+1)%8 == 0) {
+            printf("\n");
+        }
+    }
+    printf("\n");
+    return;
+}
 
 GLWindow *GLWindow::create(void *win) {
 
     GLWindow *glWindow = new GLWindow();
-    return glWindow->init(win) ? glWindow : nullptr;
+    glWindow->win = win;
+    return glWindow;
 }
 
 void GLWindow::render(VoData *voData) {
     if (nullptr == glTexture) {
+        init(win);
         glTexture = new GLTexture();
         glTexture->init(voData->getFormat());
     }
     // 画图
+    hexdump(voData->getFrameData()[0], 16);
     glTexture->draw(voData->getFrameData(), voData->getWidth(), voData->getHeight());
 
     // 显示
@@ -38,7 +72,7 @@ bool GLWindow::init(void *win) {
     display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == display) {
         KLOGE(TAG_LOG, "eglGetDisplay failed");
-        return nullptr;
+        return false;
     }
     KLOGE(TAG_LOG, "eglGetDisplay success");
 
@@ -98,4 +132,44 @@ void GLWindow::flip() {
         return;
     }
     eglSwapBuffers(display, surface);
+}
+
+void GLWindow::attachInputQueue(BlockingQueueSTL<VoData> *queue) {
+    vo_queue = queue;
+}
+
+void GLWindow::start() {
+    KLOGE(TAG_LOG, "start In");
+    if (pthread_create(&inner_thread, nullptr, static_run, this)) {
+        KLOGE(TAG_LOG, "pthread_create %s failed!", THREAD_NAME);
+        return;
+    }
+    status = WIN_STATUS_RUNNING;
+}
+
+void GLWindow::threadRun() {
+    bool is_exit = false;
+    while (!is_exit) {
+        switch (status) {
+            case WIN_STATUS_IDLE:
+                usleep(16); //16ms
+                break;
+
+            case WIN_STATUS_RUNNING:
+            {
+                VoData voData = vo_queue->get_font();
+                render(&voData);
+                voData.free();
+                break;
+            }
+
+            case WIN_STATUS_STOP:
+                is_exit = true;
+                break;
+        }
+    }
+}
+
+void GLWindow::stop() {
+    status = WIN_STATUS_STOP;
 }

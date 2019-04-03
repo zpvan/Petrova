@@ -7,8 +7,9 @@
 
 #include "player/FFDemuxer.h"
 #include "player/FFDecoder.h"
-#include "player/GLWindow.h"
+#include "gl/GLWindow.h"
 #include "data/PlayerData.h"
+#include "util/BlockingQueueSTL.h"
 
 #include <pthread.h>
 #include <list>
@@ -52,6 +53,11 @@ private:
     FFDemuxer *ffDemuxer = nullptr;
     FFDecoder *ffDecoder = nullptr;
     GLWindow *glWindow = nullptr;
+
+    BlockingQueueSTL<DmxData> *dmx_v_list = nullptr;
+    BlockingQueueSTL<DmxData> *dmx_a_list = nullptr;
+
+    BlockingQueueSTL<VoData> *vo_list = nullptr;
 };
 
 

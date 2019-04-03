@@ -2,7 +2,7 @@
 // Created by michelle on 2019/4/2.
 //
 
-#include "player/GLTexture.h"
+#include "gl/GLTexture.h"
 
 void GLTexture::init(int colorFmt) {
     glShader.init(GLShader::pixelFmt2ShaderType((AVPixelFormat) colorFmt));

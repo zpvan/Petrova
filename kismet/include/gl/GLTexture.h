@@ -5,7 +5,7 @@
 #ifndef PETROVA_GLTEXTURE_H
 #define PETROVA_GLTEXTURE_H
 
-#include "player/GLShader.h"
+#include "GLShader.h"
 
 class GLTexture {
 public:

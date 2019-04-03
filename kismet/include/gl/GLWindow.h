@@ -5,15 +5,27 @@
 #ifndef PETROVA_GLWINDOW_H
 #define PETROVA_GLWINDOW_H
 
-#include "player/GLTexture.h"
+#include "GLTexture.h"
 #include "data/VoData.h"
 
+#include "util/BlockingQueueSTL.h"
+
 #include <EGL/egl.h>
+
+volatile typedef enum {
+    WIN_STATUS_IDLE,
+    WIN_STATUS_RUNNING,
+    WIN_STATUS_STOP,
+} win_status_t;
 
 class GLWindow {
 public:
     static GLWindow *create(void *win);
     void render(VoData *voData);
+    void attachInputQueue(BlockingQueueSTL<VoData> *queue);
+    void start();
+    void threadRun();
+    void stop();
 
 private:
     GLWindow() {};
@@ -26,6 +38,12 @@ private:
 
     GLTexture *glTexture = nullptr;
     void *win = nullptr;
+
+    pthread_t inner_thread;
+
+    BlockingQueueSTL<VoData> *vo_queue;
+
+    volatile win_status_t status = WIN_STATUS_IDLE;
 };
 
 
