@@ -12,8 +12,6 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import java.io.File;
-
 public class KismetActivity extends AppCompatActivity implements SurfaceHolder.Callback{
 
     private static final String TAG = "KismetActivity";
@@ -76,14 +74,7 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
         if (null == mPlayer) {
             mPlayer = new PlayerProxy();
         }
-//        File mediaFile = new File(MEDIA_FILE);
-        File mediaFile = new File("/mnt/sdcard/DCIM/Camera/1548569015270.jpg");
-        if (mediaFile.exists()) {
-            Log.e(TAG, "surfaceCreated: mediaFile(exists=" + mediaFile.exists() + " read=" +
-                    mediaFile.canRead() + " write=" + mediaFile.canWrite() + " execute=" + mediaFile.canExecute() + ")");
-        }
         mPlayer.setDataSource(MEDIA_FILE);
-//        mPlayer.setDataSource(Environment.getExternalStorageDirectory().getPath() + "/Download/valor-01-01.mp4");
         mPlayer.setDisplay(holder);
         mPlayer.prepare();
         mPlayer.start();
@@ -92,9 +83,6 @@ public class KismetActivity extends AppCompatActivity implements SurfaceHolder.C
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.e(TAG, "surfaceChanged: HolderCallback");
-        // if (null != mPlayer) {
-        //     mPlayer.setDisplay(holder);
-        // }
     }
 
     @Override

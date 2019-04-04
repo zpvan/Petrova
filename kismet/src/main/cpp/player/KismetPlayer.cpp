@@ -54,6 +54,17 @@ static void *static_run(void *data) {
 }
 
 // PUBLIC
+KismetPlayer::KismetPlayer():
+    ffDemuxer(nullptr),
+    ffDecoder(nullptr),
+    glWindow(nullptr),
+    dmx_v_list(nullptr),
+    dmx_a_list(nullptr),
+    vo_list(nullptr),
+    is_paused(true) {
+
+}
+
 void KismetPlayer::init() {
     // 创建线程ply-thread
     // TODO 创建线程有两种方法, 一种是POSIX thread, 一种是C++ 11 thread
@@ -260,14 +271,6 @@ void KismetPlayer::innerPrepare() {
         ffDecoder->attachOutputQueue(vo_list);
         glWindow->attachInputQueue(vo_list);
     }
-//    if (ffDemuxer->getBestAudioIndex() >= 0) {
-//        KLOGE(TAG_LOG, "best audio %d", ffDemuxer->getBestAudioIndex());
-//        dmx_a_list = new BlockingQueueSTL(50);
-//        ffDemuxer->attachAudioQueue(dmx_a_list);
-//        ffDecoder = FFDecoder::openAudioDecoder(ffDemuxer);
-//        ffDecoder->attachInputQueue(dmx_a_list);
-//    }
-
 }
 
 void KismetPlayer::innerStart() {

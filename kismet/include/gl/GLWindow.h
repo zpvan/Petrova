@@ -6,9 +6,11 @@
 #define PETROVA_GLWINDOW_H
 
 #include "GLTexture.h"
-#include "data/VoData.h"
 
+#include "common/RunnablePsx.h"
+#include "data/VoData.h"
 #include "util/BlockingQueueSTL.h"
+
 
 #include <EGL/egl.h>
 
@@ -18,7 +20,7 @@ volatile typedef enum {
     WIN_STATUS_STOP,
 } win_status_t;
 
-class GLWindow {
+class GLWindow : public RunnablePsx {
 public:
     static GLWindow *create(void *win);
     void render(VoData *voData);
@@ -26,6 +28,10 @@ public:
     void start();
     void threadRun();
     void stop();
+
+protected:
+    virtual void thread_loop();
+    virtual const char* get_thread_name();
 
 private:
     GLWindow() {};

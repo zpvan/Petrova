@@ -71,6 +71,7 @@ void FFDecoder::push(DmxData dmxData) {
     AVPacket *pkt = dmxData.getPkt();
     if (pkt->stream_index == video_stream_index) {
         // 解码
+        hex_dump(TAG_LOG, pkt->data, 16);
         avcodec_send_packet(avCodecCtx, pkt);
 //        KLOGE(TAG_LOG, "send success");
     }

@@ -19,4 +19,21 @@
 
 #endif
 
+#include <stdlib.h>
+#include <string.h>
+
+static void hex_dump(const char *tag, const unsigned char *buf, const int num)
+{
+    int dump_size = num * 3 * sizeof(unsigned char);
+    char *dump = (char *)malloc(dump_size);
+    memset(dump, 0, dump_size);
+    int i;
+    for(i = 0; i < num; i++) {
+        sprintf(dump + i * 3, "%02X ", buf[i]);
+    }
+    KLOGE(tag, "hex_dump %s", dump);
+    free(dump);
+    return;
+}
+
 #endif //PETROVA_KISLOG_H

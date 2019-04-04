@@ -26,21 +26,6 @@ static void *static_run(void *data) {
     return nullptr;
 }
 
-static void hexdump(const unsigned char *buf, const int num)
-{
-    int i;
-    printf(TAG_LOG);
-    for(i = 0; i < num; i++)
-    {
-        printf("%02X ", buf[i]);
-        if ((i+1)%8 == 0) {
-            printf("\n");
-        }
-    }
-    printf("\n");
-    return;
-}
-
 GLWindow *GLWindow::create(void *win) {
 
     GLWindow *glWindow = new GLWindow();
@@ -55,7 +40,7 @@ void GLWindow::render(VoData *voData) {
         glTexture->init(voData->getFormat());
     }
     // 画图
-    hexdump(voData->getFrameData()[0], 16);
+    // hex_dump(TAG_LOG, voData->getFrameData()[0], 16);
     glTexture->draw(voData->getFrameData(), voData->getWidth(), voData->getHeight());
 
     // 显示
@@ -74,14 +59,14 @@ bool GLWindow::init(void *win) {
         KLOGE(TAG_LOG, "eglGetDisplay failed");
         return false;
     }
-    KLOGE(TAG_LOG, "eglGetDisplay success");
+    // KLOGE(TAG_LOG, "eglGetDisplay success");
 
     //2 初始化Display
     if (EGL_TRUE != eglInitialize(display, 0, 0)) {
         KLOGE(TAG_LOG, "eglInitialize failed");
         return false;
     }
-    KLOGE(TAG_LOG, "eglInitialize success");
+    // KLOGE(TAG_LOG, "eglInitialize success");
 
     //3 获取配置
     EGLConfig config = 0;
@@ -97,7 +82,7 @@ bool GLWindow::init(void *win) {
         KLOGE(TAG_LOG, "eglChooseConfig failed");
         return false;
     }
-    KLOGE(TAG_LOG, "eglChooseConfig success");
+    // KLOGE(TAG_LOG, "eglChooseConfig success");
 
     //4 创建surface
     surface = eglCreateWindowSurface(display, config, nwin, NULL);
@@ -105,7 +90,7 @@ bool GLWindow::init(void *win) {
         KLOGE(TAG_LOG, "eglCreateWindowSurface failed nwin=%p", nwin);
         return false;
     }
-    KLOGE(TAG_LOG, "eglCreateWindowSurface success");
+    // KLOGE(TAG_LOG, "eglCreateWindowSurface success");
 
     //5 创建并打开EGL上下文
     const EGLint ctxAttr[] = {
@@ -123,7 +108,7 @@ bool GLWindow::init(void *win) {
         KLOGE(TAG_LOG, "eglMakeCurrent failed");
         return false;
     }
-    KLOGE(TAG_LOG, "EGL Init Success");
+    // KLOGE(TAG_LOG, "EGL Init Success");
     return true;
 }
 
@@ -139,12 +124,10 @@ void GLWindow::attachInputQueue(BlockingQueueSTL<VoData> *queue) {
 }
 
 void GLWindow::start() {
-    KLOGE(TAG_LOG, "start In");
-    if (pthread_create(&inner_thread, nullptr, static_run, this)) {
-        KLOGE(TAG_LOG, "pthread_create %s failed!", THREAD_NAME);
-        return;
+    // KLOGE(TAG_LOG, "start");
+    if (start_thread()) {
+        status = WIN_STATUS_RUNNING;
     }
-    status = WIN_STATUS_RUNNING;
 }
 
 void GLWindow::threadRun() {
@@ -171,5 +154,31 @@ void GLWindow::threadRun() {
 }
 
 void GLWindow::stop() {
+    // KLOGE(TAG_LOG, "stop");
     status = WIN_STATUS_STOP;
+    stop_thread();
+}
+
+// Extends RunnablePsx
+void GLWindow::thread_loop() {
+    switch (status) {
+        case WIN_STATUS_IDLE:
+            usleep(16); //16ms
+            break;
+
+        case WIN_STATUS_RUNNING:
+        {
+            VoData voData = vo_queue->get_font();
+            render(&voData);
+            voData.free();
+            break;
+        }
+
+        case WIN_STATUS_STOP:
+            break;
+    }
+}
+
+const char *GLWindow::get_thread_name() {
+    return THREAD_NAME;
 }

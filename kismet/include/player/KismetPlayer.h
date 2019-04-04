@@ -17,6 +17,7 @@
 class KismetPlayer {
 
 public:
+    KismetPlayer();
     void init();
 
     void setDataSource(const char *path);
@@ -50,14 +51,16 @@ private:
     pthread_mutex_t msg_list_mutex;
     std::list<player_msg_t> msg_list;
 
-    FFDemuxer *ffDemuxer = nullptr;
-    FFDecoder *ffDecoder = nullptr;
-    GLWindow *glWindow = nullptr;
+    // prt
+    FFDemuxer *ffDemuxer;
+    FFDecoder *ffDecoder;
+    GLWindow *glWindow;
+    BlockingQueueSTL<DmxData> *dmx_v_list;
+    BlockingQueueSTL<DmxData> *dmx_a_list;
+    BlockingQueueSTL<VoData> *vo_list;
 
-    BlockingQueueSTL<DmxData> *dmx_v_list = nullptr;
-    BlockingQueueSTL<DmxData> *dmx_a_list = nullptr;
-
-    BlockingQueueSTL<VoData> *vo_list = nullptr;
+    // standard
+    bool is_paused;
 };
 
 
