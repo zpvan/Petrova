@@ -22,12 +22,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
+import androidx.annotation.NonNull;
 
 import com.knox.kaleidoscope.CameraError;
 import com.knox.kaleidoscope.CameraUtil;
