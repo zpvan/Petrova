@@ -1,1 +1,1 @@
-include ':app', ':kismet', ':kaleidoscope', ':ringbuffer'
+include ':app', ':kismet', ':kaleidoscope', ':ringbuffer', ':aes'
