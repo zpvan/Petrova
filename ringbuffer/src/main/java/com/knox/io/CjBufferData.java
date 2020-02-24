@@ -1,22 +1,14 @@
 package com.knox.io;
 
 public class CjBufferData {
-    private int size;
-    private int pts;
+    private int mParam;
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setParam(int param) {
+        mParam = param;
     }
 
-    public int getSize() {
-        return size;
+    public int getParam() {
+        return mParam;
     }
 
-    public void setPts(int pts) {
-        this.pts = pts;
-    }
-
-    public int getPts() {
-        return pts;
-    }
 }

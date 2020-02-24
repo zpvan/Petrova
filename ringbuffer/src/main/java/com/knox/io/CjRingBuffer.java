@@ -78,7 +78,7 @@ public class CjRingBuffer {
     }
 
     // read ==> data from ByteBuffer to byte[]
-    public int jRead(final byte[] pBuffer, final int pOffset, final int pLength) {
+    private int jRead(final byte[] pBuffer, final int pOffset, final int pLength) {
         Objects.requireNonNull(pBuffer, "Buffer");
 
         // 查询有效数据的长度
@@ -111,25 +111,10 @@ public class CjRingBuffer {
         }
     }
 
-    public void cRead(final byte[] pBuffer, final int pOffset, final int pLength) {
-        native_cread(pBuffer, pOffset, pLength);
-        CjBufferData buffer = cjList.get(0);
-    }
-
-
     // write ==> data from byte[] to ByteBuffer
-    public int jWrite(final byte[] pBuffer, final int pOffset, final int pLength) {
+    private int jWrite(final byte[] pBuffer, final int pOffset, final int pLength) {
         int lim = storeLimit();
         return 0;
     }
 
-    public void cWrite(final byte[] pBuffer, final int pOffset, final int pLength) {
-        native_cwrite(pBuffer, pOffset, pLength);
-        cjList.add(new CjBufferData());
-    }
-
-    //-----------------------jni-----------------------
-    private native final void native_cwrite(final byte[] pBuffer, final int pOffset, final int pLength);
-
-    private native final void native_cread(final byte[] pBuffer, final int pOffset, final int pLength);
 }
