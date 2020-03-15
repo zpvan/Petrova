@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">btble</string>
+
+    <string name="search_bt">SEARCH BT</string>
+    <string name="advertise_bt">ADVERTISE_BT</string>
+    <string name="search_ble">SEARCH BLE</string>
+    <string name="advertise_ble">ADVERTISE_BLE</string>
+</resources>
