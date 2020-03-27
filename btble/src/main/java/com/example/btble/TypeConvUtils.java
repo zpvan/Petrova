@@ -150,5 +150,5 @@ public class TypeConvUtils {
         }
         return (index > 0) ? new String(bs, offset, index) : "0";
     }
-    
+
 }
