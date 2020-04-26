@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 
@@ -29,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private              long   mReadRate;
     private              long   mEncryptRate;
     private              long   mDecryptRate;
+    private AndroidAES          mEncryptAES;
+    private AndroidAES          mDecryptAES;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +47,9 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 try {
-                                    mReadAllRate = 0;
-                                    mReadRate = 0;
-                                    mEncryptRate = 0;
-                                    mDecryptRate = 0;
-                                    int TIMES = 100;
-                                    for (int i = 0; i < TIMES; i++) {
-                                        doSomething(i);
-                                    }
-                                    Log.e(TAG, "readAllRate: " + (mReadAllRate / TIMES) + " B/s\n"
-                                            + "readRate: " + (mReadRate / TIMES) + " B/s\n"
-                                            + "encryptRate: " + (mEncryptRate / TIMES) + " B/s\n"
-                                            + "decryptRate: " + (mDecryptRate / TIMES) + " B/s\n");
+                                    testAES(AndroidAES.KAES_128_LENGTH);
+
+                                    testAES(AndroidAES.KAES_256_LENGTH);
                                 } catch (FileNotFoundException e) {
                                     e.printStackTrace();
                                 } catch (IOException e) {
@@ -103,12 +95,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private static final int    READ_SIZE       = 60 * 1024;
+    private void testAES(int keyLength) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, ShortBufferException, InvalidKeyException {
+        mReadAllRate = 0;
+        mReadRate = 0;
+        mEncryptRate = 0;
+        mDecryptRate = 0;
+        //int TIMES = 2;
+        //for (int i = 0; i < TIMES; i++) {
+        //    doSomething(i, keyLength);
+        //}
+        //Log.e(TAG, "key bit: " + (keyLength * 8) + "\n"
+        //        + "readAllRate: " + (mReadAllRate / TIMES) + " B/s\n"
+        //        + "readRate: " + (mReadRate / TIMES) + " B/s\n"
+        //        + "encryptRate: " + (mEncryptRate / TIMES) + " B/s\n"
+        //        + "decryptRate: " + (mDecryptRate / TIMES) + " B/s\n");
+
+        doSomething(1, keyLength);
+    }
+
+    private static final int    READ_SIZE       = 1 * 1024;
     private static final int    ENCRYPT_PADDING = 100;
-    private              byte[] mReadBuf        = new byte[READ_SIZE + ENCRYPT_PADDING];
+    private              byte[] mReadBuf1       = new byte[READ_SIZE + ENCRYPT_PADDING];
+    private              byte[] mReadBuf10       = new byte[READ_SIZE * 10 + ENCRYPT_PADDING];
+    private              byte[] mReadBuf50       = new byte[READ_SIZE * 50 + ENCRYPT_PADDING];
+    private              byte[] mReadBuf100       = new byte[READ_SIZE * 100 + ENCRYPT_PADDING];
+    private              byte[] mReadBuf500       = new byte[READ_SIZE * 500 + ENCRYPT_PADDING];
+    private              byte[] mReadBuf1000       = new byte[READ_SIZE * 1000 + ENCRYPT_PADDING];
     private              int    mTotalSize      = 0;
 
-    private void doSomething(int index) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, ShortBufferException, InvalidKeyException {
+    private void doSomething(int index, int keyLength) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, ShortBufferException, InvalidKeyException {
         String testFile = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/Download/"
                 + "teststream/"
@@ -118,8 +133,8 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, file.getAbsolutePath() + " can't read");
             return;
         }
-        AndroidAES encryptAES = AndroidAES.create();
-        AndroidAES decryptAES = AndroidAES.create();
+        mEncryptAES = AndroidAES.create(keyLength);
+        mDecryptAES = AndroidAES.create(keyLength);
 
         Log.e(TAG, "do Something (" + index + ")");
         FileInputStream fileInputStream = new FileInputStream(file);
@@ -131,31 +146,46 @@ public class MainActivity extends AppCompatActivity {
         long decryptTimeMillis = 1;
         long readStartTimeMillis = 0;
         long readTimeMillis = 1;
-        long startTimeMillis = System.currentTimeMillis();
-        do {
-            readStartTimeMillis = System.currentTimeMillis();
-            read = fileInputStream.read(mReadBuf, 0, READ_SIZE);
-            readTimeMillis += (System.currentTimeMillis() - readStartTimeMillis);
-            mTotalSize += read;
+        //long startTimeMillis = System.currentTimeMillis();
+        //do {
+        //    readStartTimeMillis = System.currentTimeMillis();
+        //    read = fileInputStream.read(mReadBuf1, 0, READ_SIZE);
+        //    readTimeMillis += (System.currentTimeMillis() - readStartTimeMillis);
+        //    mTotalSize += read;
+        //
+        //    encryptStartTimeMillis = System.currentTimeMillis();
+        //    int ct = encrypt128AES.encrypt(mReadBuf1, 0, READ_SIZE);
+        //    encryptTimeMillis += (System.currentTimeMillis() - encryptStartTimeMillis);
+        //
+        //    decryptStartTimeMillis = System.currentTimeMillis();
+        //    int pt = decrypt128AES.decrypt(mReadBuf1, 0, ct);
+        //    decryptTimeMillis += (System.currentTimeMillis() - decryptStartTimeMillis);
+        //} while (read == READ_SIZE);
+        //long costTimeMillis = System.currentTimeMillis() - startTimeMillis;
 
-            encryptStartTimeMillis = System.currentTimeMillis();
-            int ct = encryptAES.encrypt(mReadBuf, 0, READ_SIZE);
-            encryptTimeMillis += (System.currentTimeMillis() - encryptStartTimeMillis);
 
-            decryptStartTimeMillis = System.currentTimeMillis();
-            int pt = decryptAES.decrypt(mReadBuf, 0, ct);
-            decryptTimeMillis += (System.currentTimeMillis() - decryptStartTimeMillis);
-        } while (read == READ_SIZE);
-        long costTimeMillis = System.currentTimeMillis() - startTimeMillis;
+        fileInputStream.read(mReadBuf1, 0, READ_SIZE);
+        fileInputStream.read(mReadBuf10, 0, READ_SIZE * 10);
+        fileInputStream.read(mReadBuf50, 0, READ_SIZE * 50);
+        fileInputStream.read(mReadBuf100, 0, READ_SIZE * 100);
+        fileInputStream.read(mReadBuf500, 0, READ_SIZE * 500);
+        fileInputStream.read(mReadBuf1000, 0, READ_SIZE * 1000);
 
+        Log.e(TAG, "key bit: " + (keyLength * 8));
 
-        //read = fileInputStream.read(mReadBuf, 0, READ_SIZE);
-        //Log.e(TAG, "before-encrypt, md5: " + AndroidAES.MD5(mReadBuf, 0, READ_SIZE));
+        testEncryptBuffer(mReadBuf1, READ_SIZE);
+        testEncryptBuffer(mReadBuf10, READ_SIZE * 10);
+        testEncryptBuffer(mReadBuf50, READ_SIZE * 50);
+        testEncryptBuffer(mReadBuf100, READ_SIZE * 100);
+        testEncryptBuffer(mReadBuf500, READ_SIZE * 500);
+        testEncryptBuffer(mReadBuf1000, READ_SIZE * 1000);
+
+        //Log.e(TAG, "before-encrypt, md5: " + AndroidAES.MD5(mReadBuf1, 0, READ_SIZE));
         //try {
-        //    int ct = encryptAES.encrypt(mReadBuf, 0, READ_SIZE);
+        //    int ct = encryptAES.encrypt(mReadBuf1, 0, READ_SIZE);
         //    Log.e(TAG, "after-encrypt, plainLength: " + read + ", chipherLength: " + (ct - 8));
-        //    int pt = decryptAES.decrypt(mReadBuf, 0, ct);
-        //    Log.e(TAG, "after-decrypt, plainLength: " + pt + ", md5: " + AndroidAES.MD5(mReadBuf, 0, pt));
+        //    int pt = decryptAES.decrypt(mReadBuf1, 0, ct);
+        //    Log.e(TAG, "after-decrypt, plainLength: " + pt + ", md5: " + AndroidAES.MD5(mReadBuf1, 0, pt));
         //} catch (InvalidAlgorithmParameterException e) {
         //    e.printStackTrace();
         //} catch (InvalidKeyException e) {
@@ -170,10 +200,31 @@ public class MainActivity extends AppCompatActivity {
 
 
         fileInputStream.close();
-        mReadAllRate += (mTotalSize * 1000) / costTimeMillis;
-        mReadRate += (mTotalSize * 1000) / readTimeMillis;
-        mEncryptRate += (mTotalSize * 1000) / encryptTimeMillis;
-        mDecryptRate += (mTotalSize * 1000) / decryptTimeMillis;
+        //mReadAllRate += (mTotalSize * 1000) / costTimeMillis;
+        //mReadRate += (mTotalSize * 1000) / readTimeMillis;
+        //mEncryptRate += (mTotalSize * 1000) / encryptTimeMillis;
+        //mDecryptRate += (mTotalSize * 1000) / decryptTimeMillis;
 
+    }
+
+    private void testEncryptBuffer(byte[] buf, int bufSize) throws InvalidAlgorithmParameterException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException, ShortBufferException {
+        long encryptStartTimeMillis;
+        long decryptStartTimeMillis;
+        long encryptTimeMillis = 0;
+        long decryptTimeMillis = 0;
+        for (int i = 0; i < 100; i++) {
+            encryptStartTimeMillis = System.currentTimeMillis();
+            int ct = mEncryptAES.encrypt(buf, 0, bufSize);
+            encryptTimeMillis += (System.currentTimeMillis() - encryptStartTimeMillis);
+
+            decryptStartTimeMillis = System.currentTimeMillis();
+            int pt = mDecryptAES.decrypt(buf, 0, ct);
+            decryptTimeMillis += (System.currentTimeMillis() - decryptStartTimeMillis);
+        }
+
+        Log.e(TAG, "bufSize: " + bufSize + "\n"
+                + "encryptRate: " + (bufSize * 10) / encryptTimeMillis + " B/s\n"
+                + "decryptRate: " + (bufSize * 10) / decryptTimeMillis + " B/s\n");
     }
 }

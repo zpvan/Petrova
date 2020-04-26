@@ -45,9 +45,9 @@ public class AndroidAES {
     /**
      * AES-GCM-NoPadding key256
      * 2020-04-26 01:53:33.423 7729-7851/com.example.aes E/AES-MAIN: readAllRate: 511981 B/s
-     *     readRate: 4824125 B/s
-     *     encryptRate: 1151645 B/s
-     *     decryptRate: 1146407 B/s
+     * readRate: 4824125 B/s
+     * encryptRate: 1151645 B/s
+     * decryptRate: 1146407 B/s
      */
 
     private static final String TAG = "AndroidAES";
@@ -66,15 +66,19 @@ public class AndroidAES {
     public static final  int KAES_128_LENGTH      = 16;
     public static final  int KAES_256_LENGTH      = 32;
 
-    private       Cipher mCipher;
-    private       Mac    mHmacSha512;
+    private Cipher mCipher;
+    private Mac    mHmacSha512;
     // 16byte + 8byte + 8byte + 8byte
-    private       byte[] mHmacShaData;
-    private       long   mT = 0;
+    private byte[] mHmacShaData;
+    private long   mT = 0;
+    private int    mKeyLength;
 
-    public static AndroidAES create() {
+    public static AndroidAES create(int keyLength) {
+        if (!(keyLength == KAES_128_LENGTH || keyLength == KAES_256_LENGTH)) {
+            throw new IllegalArgumentException("keyLength must be " + KAES_128_LENGTH + " or " + KAES_256_LENGTH);
+        }
         try {
-            return new AndroidAES();
+            return new AndroidAES(keyLength);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
@@ -92,7 +96,7 @@ public class AndroidAES {
         byte[] aesGcmParams = mHmacSha512.doFinal(mHmacShaData);
 
         GCMParameterSpec ivSpec = new GCMParameterSpec(AUTH_TAG_LENGTH_BITS, aesGcmParams, IV_OFFSET, IV_LENGTH);
-        SecretKeySpec secretKeySpec = new SecretKeySpec(aesGcmParams, KAES_OFFSET, KAES_256_LENGTH, AES_ALGORITHM);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(aesGcmParams, KAES_OFFSET, mKeyLength, AES_ALGORITHM);
         mCipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec);
         mCipher.updateAAD(aesGcmParams, AAD_OFFSET, AAD_LENGTH);
 
@@ -116,7 +120,7 @@ public class AndroidAES {
         byte[] aesGcmParams = mHmacSha512.doFinal(mHmacShaData);
 
         GCMParameterSpec ivSpec = new GCMParameterSpec(AUTH_TAG_LENGTH_BITS, aesGcmParams, IV_OFFSET, IV_LENGTH);
-        SecretKeySpec secretKeySpec = new SecretKeySpec(aesGcmParams, KAES_OFFSET, KAES_256_LENGTH, AES_ALGORITHM);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(aesGcmParams, KAES_OFFSET, mKeyLength, AES_ALGORITHM);
         mCipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivSpec);
         mCipher.updateAAD(aesGcmParams, AAD_OFFSET, AAD_LENGTH);
 
@@ -124,7 +128,9 @@ public class AndroidAES {
         return ptLength;
     }
 
-    private AndroidAES() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
+    private AndroidAES(int keyLength) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
+
+        mKeyLength = keyLength;
 
         byte[] challenge = "QWERTYASDFGHZXCV".getBytes();
         mHmacShaData = new byte[challenge.length + T_LENGTH];
@@ -182,4 +188,34 @@ public class AndroidAES {
         }
         return builder.toString();
     }
+
+    /**
+     * 60K
+     * 2020-04-27 05:38:27.494 28201-28387/com.example.aes E/AES-MAIN: key bit: 128
+     *     readAllRate: 518959 B/s
+     *     readRate: 4615379 B/s
+     *     encryptRate: 1188961 B/s
+     *     decryptRate: 1159587 B/s
+     *
+     * 2020-04-27 05:38:35.681 28201-28387/com.example.aes E/AES-MAIN: key bit: 256
+     *     readAllRate: 516165 B/s
+     *     readRate: 5155291 B/s
+     *     encryptRate: 1170323 B/s
+     *     decryptRate: 1129835 B/s
+     */
+
+    /**
+     * 600K
+     * 2020-04-27 05:41:10.270 28558-28679/com.example.aes E/AES-MAIN: key bit: 128
+     *     readAllRate: 641653 B/s
+     *     readRate: 5048166 B/s
+     *     encryptRate: 1514260 B/s
+     *     decryptRate: 1432735 B/s
+     *
+     * 2020-04-27 05:41:16.518 28558-28679/com.example.aes E/AES-MAIN: key bit: 256
+     *     readAllRate: 676430 B/s
+     *     readRate: 5621391 B/s
+     *     encryptRate: 1548496 B/s
+     *     decryptRate: 1528507 B/s
+     */
 }
